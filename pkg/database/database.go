@@ -41,7 +41,7 @@ func CloseDB() {
 }
 
 /* Function that creates tasks */
-func CreateTask(t models.Task) (models.Task, error) {
+func InsertTask(t models.Task) (models.Task, error) {
 	res, e := db.Exec("INSERT INTO tasks (title, description, dueDate, status) VALUES (?, ?, ?, ?)",
 		t.Title, t.Description, t.DueDate, t.Status)
 
