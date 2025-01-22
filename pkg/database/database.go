@@ -9,7 +9,7 @@ import (
 
 var db *sql.DB
 
-// DB Initialize/Close
+/* DB Initialize/Close */
 func DBInit() {
 	var e error
 	db, e := sql.Open("sqlite3", "tasks.db")
@@ -40,6 +40,7 @@ func CloseDB() {
 	}
 }
 
+/* Function that creates tasks */
 func CreateTask(t models.Task) (models.Task, error) {
 	res, e := db.Exec("INSERT INTO tasks (title, description, dueDate, status) VALUES (?, ?, ?, ?)",
 		t.Title, t.Description, t.DueDate, t.Status)
@@ -58,12 +59,21 @@ func CreateTask(t models.Task) (models.Task, error) {
 	return t, nil
 }
 
+/* Function that deletes tasks */
 func DeleteTask(id int) error {
-	_, e := db.Exec("DELETE FROM tasks WHERE id = ?", id)
+	res, e := db.Exec("DELETE FROM tasks WHERE id = ?", id)
 
 	if e != nil {
 		return fmt.Errorf("\nFailed to delete task.\nERROR: %v", e)
 	}
 
+	found, _ := res.RowsAffected()
+
+	if found == 0 {
+		return fmt.Errorf("Task not found 404\nERROR: %v", e)
+	}
+
 	return nil
 }
+
+
