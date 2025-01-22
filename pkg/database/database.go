@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"swapxs/api_proj/pkg/models"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var db *sql.DB
@@ -40,8 +41,25 @@ func CloseDB() {
 	}
 }
 
+
+func GetTaskID(id int) (models.Task, error) {
+	var t models.Task
+
+	e := db.QueryRow("SELECT id, title, description, dueDate, status FROM tasks WHERE id = ?", id).Scan(
+		&t.ID, &t.Title, &t.Description, &t.DueDate, &t.Status)
+
+	if e == sql.ErrNoRows {
+		return models.Task{}, fmt.Errorf("Task not found")
+	} else if e != nil {
+		return models.Task{}, fmt.Errorf("Failed to get task:\nERROR: %v", e)
+	}
+
+	return t, nil
+}
+
+
 /* Function that creates tasks */
-func InsertTask(t models.Task) (models.Task, error) {
+func CreateTask(t models.Task) (models.Task, error) {
 	res, e := db.Exec("INSERT INTO tasks (title, description, dueDate, status) VALUES (?, ?, ?, ?)",
 		t.Title, t.Description, t.DueDate, t.Status)
 
@@ -57,6 +75,24 @@ func InsertTask(t models.Task) (models.Task, error) {
 
 	t.ID = int(id)
 	return t, nil
+}
+
+func UpdateTask(id int, t models.Task) (models.Task, error) {
+	_, e := db.Exec("UPDATE tasks SET title = ?, description = ?, dueDate = ? WHERE id = ?",
+		t.Title, t.Description, t.DueDate, id)
+
+	if e != nil {
+		return models.Task{}, fmt.Errorf("failed to update task: %v", e)
+	}
+
+	updatedTask, e := GetTaskID(id)
+
+
+    if e != nil {
+        return models.Task{}, fmt.Errorf("failed to get updated task: %v", e)
+    }
+
+    return updatedTask, nil
 }
 
 /* Function that deletes tasks */
@@ -75,5 +111,4 @@ func DeleteTask(id int) error {
 
 	return nil
 }
-
 
