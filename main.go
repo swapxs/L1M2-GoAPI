@@ -36,7 +36,7 @@ func main() {
 	// Part 5
 	r.GET("/tasks", api.ReadAll)
 
-	if e := r.Run(":8080"); e != nil {
-		log.Fatalf("Failed to start server: %v", e)
+	if err := r.Run(":8080"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
