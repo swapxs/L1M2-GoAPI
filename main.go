@@ -4,7 +4,6 @@ import (
 	"log"
 	"swapxs/api_proj/pkg/api"
 	"swapxs/api_proj/pkg/database"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +17,10 @@ func main() {
 		log.Fatalf("Failed to start server: %v", e)
 	}
 
+	// Part 1
 	r.POST("/tasks", api.Create)
+	// Part 3
 	r.PUT("/tasks/:id", api.Update)
+	// Part 4
 	r.DELETE("/tasks/:id", api.Delete)
 }
