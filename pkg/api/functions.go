@@ -1,3 +1,8 @@
+/* Created by Swapnil Bhowmik (XS/IN/0893) for Go API Task in L1: Module 2 
+* This files acts as an intermediary between the main go file and the database
+* functions and parses the requests from each endpoints to the desired function
+* in the database.go file. */
+
 package api
 
 import (
