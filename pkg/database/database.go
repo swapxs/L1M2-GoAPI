@@ -13,7 +13,7 @@ var db *sql.DB
 /* DB Initialize/Close */
 func DBInit() {
 	var e error
-	db, e := sql.Open("sqlite3", "tasks.db")
+	db, e = sql.Open("sqlite3", "tasks.db")
 
 	if e != nil {
 		log.Fatalf("failed to open database: %v", e)
