@@ -1,3 +1,9 @@
+/* Created by Swapnil Bhowmik (XS/IN/0893) for Go API Task in L1: Module 2 
+* This file/module has the following function:
+* 1. Handle the starting and closing of the sqlite database
+* 2. perform CRUD operation by getting input from the /pkg/api/functions.go
+*    file */
+
 package database
 
 import (
