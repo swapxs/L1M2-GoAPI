@@ -11,7 +11,7 @@ import (
 )
 
 // CRUD
-func CreateTask(c *gin.Context) {
+func Create(c *gin.Context) {
 	var newTask models.Task
 
 	if e := c.BindJSON(&newTask); e != nil {
