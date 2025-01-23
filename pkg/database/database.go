@@ -10,7 +10,7 @@ import (
 
 var db *sql.DB
 
-/* DB Initialize/Close */
+// Start the Database
 func DBInit() {
 	var e error
 	db, e = sql.Open("sqlite3", "tasks.db")
@@ -35,12 +35,37 @@ func DBInit() {
 	}
 }
 
+// Close the Database
 func CloseDB() {
 	if db != nil {
 		db.Close()
 	}
 }
 
+func GetAllTasks() ([]format.Task, error) {
+	var allTasks []format.Task
+
+	r, e := db.Query("SELECT id, title, description, dueDate, status FROM tasks")
+
+	if e != nil {
+		return nil, fmt.Errorf("Failed to get all tasks.\nERROR: %v", e)
+	}
+
+	defer r.Close()
+
+	for r.Next() {
+		var t format.Task
+
+		e := r.Scan(&t.ID, &t.Title, &t.Description, &t.DueDate, &t.Status)
+
+		if e != nil {
+			return nil, fmt.Errorf("Failed to scan tasks.\nERROR: %v", e)
+		}
+
+		allTasks = append(allTasks, t)
+	}
+	return allTasks, nil
+}
 
 func GetTaskID(id int) (format.Task, error) {
 	var t format.Task
@@ -58,7 +83,7 @@ func GetTaskID(id int) (format.Task, error) {
 }
 
 
-/* Function that creates tasks */
+// Function that creates tasks
 func CreateTask(t format.Task) (format.Task, error) {
 	res, e := db.Exec("INSERT INTO tasks (title, description, dueDate, status) VALUES (?, ?, ?, ?)",
 		t.Title, t.Description, t.DueDate, t.Status)
@@ -95,7 +120,7 @@ func UpdateTask(id int, t format.Task) (format.Task, error) {
     return updatedTask, nil
 }
 
-/* Function that deletes tasks */
+// Function that deletes tasks
 func DeleteTask(id int) error {
 	res, e := db.Exec("DELETE FROM tasks WHERE id = ?", id)
 
