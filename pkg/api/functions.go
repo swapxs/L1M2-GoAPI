@@ -10,7 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CRUD
+// CRUD Operations
+// 1. Create new data
 func Create(c *gin.Context) {
 	var newTask format.Task
 
@@ -29,13 +30,13 @@ func Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, t)
 }
 
+// 2. Read specified data & ReadAll data
 func Read(c *gin.Context) {
 	getIdPara := c.Param("id")
 	
 	id, e := strconv.Atoi(getIdPara)
 
 	if e != nil {
-		// error
 		return
 	}
 
@@ -48,6 +49,17 @@ func Read(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 }
 
+func ReadAll(c *gin.Context) {
+	t, e := database.GetAllTasks()
+
+	if e != nil {
+		return
+	}
+
+	c.JSON(http.StatusOK, t)
+}
+
+// 3. Update specified data
 func Update(c *gin.Context) {
 	var updateTask format.Task
 	getIdPara := c.Param("id")
@@ -55,7 +67,6 @@ func Update(c *gin.Context) {
 	id, e := strconv.Atoi(getIdPara)
 
 	if e != nil {
-		// error
 		return
 	}
 
@@ -68,7 +79,7 @@ func Update(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 }
 
-// Function for the delete operation for /task/:id
+// 3. Delete specified data
 func Delete(c *gin.Context) {
 	getIdPara := c.Param("id")
 	
