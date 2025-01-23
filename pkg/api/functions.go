@@ -3,9 +3,6 @@
 * functions. These parse and validate the requests from each endpoints to the
 * desired function in the database.go file. */
 
-// TODO
-// [X] fix error message
-// [ ] fix potential bugs
 package api
 
 import (
