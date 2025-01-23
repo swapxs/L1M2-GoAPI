@@ -18,11 +18,11 @@ var db *sql.DB
 
 // Start the Database
 func DBInit() {
-	var e error
-	db, e = sql.Open("sqlite3", "tasks.db")
+	var err error
+	db, err = sql.Open("sqlite3", "tasks.db")
 
-	if e != nil {
-		log.Fatalf("failed to open database: %v", e)
+	if err != nil {
+		log.Fatalf("failed to open database: %v", err)
 	}
 
 	tC := `
@@ -34,10 +34,10 @@ func DBInit() {
 			status TEXT
 		)
 	`
-	_, e = db.Exec(tC)
+	_, err = db.Exec(tC)
 
-	if e != nil {
-		log.Fatalf("\nFailed to create table: %v\n", e)
+	if err != nil {
+		log.Fatalf("\nFailed to create table: %v\n", err)
 	}
 }
 
@@ -51,10 +51,10 @@ func CloseDB() {
 func GetAllTasks() ([]format.Task, error) {
 	var allTasks []format.Task
 
-	r, e := db.Query("SELECT id, title, description, dueDate, status FROM tasks")
+	r, err := db.Query("SELECT id, title, description, dueDate, status FROM tasks")
 
-	if e != nil {
-		return nil, fmt.Errorf("Failed to get all tasks.\nERROR: %v", e)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get all tasks.\nERROR: %v", err)
 	}
 
 	defer r.Close()
@@ -62,10 +62,10 @@ func GetAllTasks() ([]format.Task, error) {
 	for r.Next() {
 		var t format.Task
 
-		e := r.Scan(&t.ID, &t.Title, &t.Description, &t.DueDate, &t.Status)
+		err := r.Scan(&t.ID, &t.Title, &t.Description, &t.DueDate, &t.Status)
 
-		if e != nil {
-			return nil, fmt.Errorf("Failed to scan tasks.\nERROR: %v", e)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to scan tasks.\nERROR: %v", err)
 		}
 
 		allTasks = append(allTasks, t)
@@ -76,13 +76,13 @@ func GetAllTasks() ([]format.Task, error) {
 func GetTaskID(id int) (format.Task, error) {
 	var t format.Task
 
-	e := db.QueryRow("SELECT id, title, description, dueDate, status FROM tasks WHERE id = ?", id).Scan(
+	err := db.QueryRow("SELECT id, title, description, dueDate, status FROM tasks WHERE id = ?", id).Scan(
 		&t.ID, &t.Title, &t.Description, &t.DueDate, &t.Status)
 
-	if e == sql.ErrNoRows {
+	if err == sql.ErrNoRows {
 		return format.Task{}, fmt.Errorf("Task not found")
-	} else if e != nil {
-		return format.Task{}, fmt.Errorf("Failed to get task:\nERROR: %v", e)
+	} else if err != nil {
+		return format.Task{}, fmt.Errorf("Failed to get task:\nERROR: %v", err)
 	}
 
 	return t, nil
@@ -90,17 +90,17 @@ func GetTaskID(id int) (format.Task, error) {
 
 // Function that creates tasks
 func CreateTask(t format.Task) (format.Task, error) {
-	res, e := db.Exec("INSERT INTO tasks (title, description, dueDate, status) VALUES (?, ?, ?, ?)",
+	res, err := db.Exec("INSERT INTO tasks (title, description, dueDate, status) VALUES (?, ?, ?, ?)",
 		t.Title, t.Description, t.DueDate, t.Status)
 
-	if e != nil {
-		return format.Task{}, fmt.Errorf("\nFailed to create new task.\nERROR: %v\n", e)
+	if err != nil {
+		return format.Task{}, fmt.Errorf("\nFailed to create new task.\nERROR: %v\n", err)
 	}
 
-	id, e := res.LastInsertId()
+	id, err := res.LastInsertId()
 
-	if e != nil {
-		return format.Task{}, fmt.Errorf("\nFailed to get task id.\nERROR: %v\n", e)
+	if err != nil {
+		return format.Task{}, fmt.Errorf("\nFailed to get task id.\nERROR: %v\n", err)
 	}
 
 	t.ID = int(id)
@@ -108,17 +108,17 @@ func CreateTask(t format.Task) (format.Task, error) {
 }
 
 func UpdateTask(id int, t format.Task) (format.Task, error) {
-	_, e := db.Exec("UPDATE tasks SET title = ?, description = ?, dueDate = ? WHERE id = ?",
+	_, err := db.Exec("UPDATE tasks SET title = ?, description = ?, dueDate = ? WHERE id = ?",
 		t.Title, t.Description, t.DueDate, id)
 
-	if e != nil {
-		return format.Task{}, fmt.Errorf("failed to update task: %v", e)
+	if err != nil {
+		return format.Task{}, fmt.Errorf("failed to update task: %v", err)
 	}
 
-	updatedTask, e := GetTaskID(id)
+	updatedTask, err := GetTaskID(id)
 
-	if e != nil {
-		return format.Task{}, fmt.Errorf("failed to get updated task: %v", e)
+	if err != nil {
+		return format.Task{}, fmt.Errorf("failed to get updated task: %v", err)
 	}
 
 	return updatedTask, nil
@@ -126,16 +126,16 @@ func UpdateTask(id int, t format.Task) (format.Task, error) {
 
 // Function that deletes tasks
 func DeleteTask(id int) error {
-	res, e := db.Exec("DELETE FROM tasks WHERE id = ?", id)
+	res, err := db.Exec("DELETE FROM tasks WHERE id = ?", id)
 
-	if e != nil {
-		return fmt.Errorf("\nFailed to delete task.\nERROR: %v", e)
+	if err != nil {
+		return fmt.Errorf("\nFailed to delete task.\nERROR: %v", err)
 	}
 
 	found, _ := res.RowsAffected()
 
 	if found == 0 {
-		return fmt.Errorf("Task not found 404\nERROR: %v", e)
+		return fmt.Errorf("Task not found 404\nERROR: %v", err)
 	}
 
 	return nil
