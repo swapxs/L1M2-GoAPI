@@ -7,14 +7,14 @@ package api
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"swapxs/api_proj/pkg/database"
 	"swapxs/api_proj/pkg/format"
 	"time"
-	"log"
-	"github.com/gin-gonic/gin"
 )
 
 // CRUD Operations
@@ -27,7 +27,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-    log.Printf("Task received: %+v ", newTask)
+	log.Printf("Task received: %+v ", newTask)
 
 	if e := IsValidTask(newTask); e != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": e.Error()})
@@ -47,7 +47,7 @@ func Create(c *gin.Context) {
 // 2. Read specified data & ReadAll data
 func Read(c *gin.Context) {
 	getIdPara := c.Param("id")
-	
+
 	id, e := strconv.Atoi(getIdPara)
 
 	if e != nil {
@@ -84,7 +84,7 @@ func ReadAll(c *gin.Context) {
 func Update(c *gin.Context) {
 	var updateTask format.Task
 	getIdPara := c.Param("id")
-	
+
 	id, e := strconv.Atoi(getIdPara)
 
 	if e != nil {
@@ -119,7 +119,7 @@ func Update(c *gin.Context) {
 // 3. Delete specified data
 func Delete(c *gin.Context) {
 	getIdPara := c.Param("id")
-	
+
 	id, e := strconv.Atoi(getIdPara)
 
 	if e != nil {
@@ -130,17 +130,16 @@ func Delete(c *gin.Context) {
 	e = database.DeleteTask(id)
 
 	if e != nil {
-        if e.Error() == "Task not found 404" {
+		if e.Error() == "Task not found 404" {
 			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to delete task: %v", e)})
 		}
-        return
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"Message": "Task deleted successfully"})
 }
-
 
 func IsValidTask(t format.Task) error {
 	switch {

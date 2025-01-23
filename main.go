@@ -1,4 +1,4 @@
-/* Created by Swapnil Bhowmik (XS/IN/0893) for Go API Task in L1: Module 2 
+/* Created by Swapnil Bhowmik (XS/IN/0893) for Go API Task in L1: Module 2
 * Main file for the entire project, this file performs the following:
 * 1. Initializes the database
 * 2. Creates a Router r using gin
@@ -9,10 +9,10 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"log"
 	"swapxs/api_proj/pkg/api"
 	"swapxs/api_proj/pkg/database"
-	"github.com/gin-gonic/gin"
 )
 
 func main() {

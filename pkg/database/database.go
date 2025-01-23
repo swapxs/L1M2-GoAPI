@@ -1,4 +1,4 @@
-/* Created by Swapnil Bhowmik (XS/IN/0893) for Go API Task in L1: Module 2 
+/* Created by Swapnil Bhowmik (XS/IN/0893) for Go API Task in L1: Module 2
 * This file/module has the following function:
 * 1. Handle the starting and closing of the sqlite database
 * 2. perform CRUD operation by getting input from the /pkg/api/functions.go
@@ -9,9 +9,9 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"swapxs/api_proj/pkg/format"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 var db *sql.DB
@@ -88,7 +88,6 @@ func GetTaskID(id int) (format.Task, error) {
 	return t, nil
 }
 
-
 // Function that creates tasks
 func CreateTask(t format.Task) (format.Task, error) {
 	res, e := db.Exec("INSERT INTO tasks (title, description, dueDate, status) VALUES (?, ?, ?, ?)",
@@ -118,12 +117,11 @@ func UpdateTask(id int, t format.Task) (format.Task, error) {
 
 	updatedTask, e := GetTaskID(id)
 
+	if e != nil {
+		return format.Task{}, fmt.Errorf("failed to get updated task: %v", e)
+	}
 
-    if e != nil {
-        return format.Task{}, fmt.Errorf("failed to get updated task: %v", e)
-    }
-
-    return updatedTask, nil
+	return updatedTask, nil
 }
 
 // Function that deletes tasks
@@ -142,4 +140,3 @@ func DeleteTask(id int) error {
 
 	return nil
 }
-
