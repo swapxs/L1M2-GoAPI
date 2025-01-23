@@ -1,7 +1,7 @@
 /* Created by Swapnil Bhowmik (XS/IN/0893) for Go API Task in L1: Module 2 
 * This files acts as an intermediary between the main go file and the database
-* functions and parses the requests from each endpoints to the desired function
-* in the database.go file. */
+* functions. These parse and validate the requests from each endpoints to the
+* desired function in the database.go file. */
 
 package api
 
@@ -42,12 +42,18 @@ func Read(c *gin.Context) {
 	id, e := strconv.Atoi(getIdPara)
 
 	if e != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid task ID"})
 		return
 	}
 
 	t, e := database.GetTaskID(id)
 
 	if e != nil {
+		if e.Error() == "task not found" {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task:\n%v", e)})
+		}
 		return
 	}
 
@@ -58,6 +64,7 @@ func ReadAll(c *gin.Context) {
 	t, e := database.GetAllTasks()
 
 	if e != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get all tasks:\n%v", e)})
 		return
 	}
 
@@ -72,12 +79,23 @@ func Update(c *gin.Context) {
 	id, e := strconv.Atoi(getIdPara)
 
 	if e != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid task ID"})
+		return
+	}
+
+	if e := c.BindJSON(&updateTask); e != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": fmt.Sprintf("Invalid request:\n%v", e)})
 		return
 	}
 
 	t, e := database.UpdateTask(id, updateTask)
 
 	if e != nil {
+		if e.Error() == "Task not found" {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task:\n%v", e)})
+		}
 		return
 	}
 
