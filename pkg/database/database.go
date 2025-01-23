@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"swapxs/api_proj/pkg/models"
+	"swapxs/api_proj/pkg/format"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -42,16 +42,16 @@ func CloseDB() {
 }
 
 
-func GetTaskID(id int) (models.Task, error) {
-	var t models.Task
+func GetTaskID(id int) (format.Task, error) {
+	var t format.Task
 
 	e := db.QueryRow("SELECT id, title, description, dueDate, status FROM tasks WHERE id = ?", id).Scan(
 		&t.ID, &t.Title, &t.Description, &t.DueDate, &t.Status)
 
 	if e == sql.ErrNoRows {
-		return models.Task{}, fmt.Errorf("Task not found")
+		return format.Task{}, fmt.Errorf("Task not found")
 	} else if e != nil {
-		return models.Task{}, fmt.Errorf("Failed to get task:\nERROR: %v", e)
+		return format.Task{}, fmt.Errorf("Failed to get task:\nERROR: %v", e)
 	}
 
 	return t, nil
@@ -59,37 +59,37 @@ func GetTaskID(id int) (models.Task, error) {
 
 
 /* Function that creates tasks */
-func CreateTask(t models.Task) (models.Task, error) {
+func CreateTask(t format.Task) (format.Task, error) {
 	res, e := db.Exec("INSERT INTO tasks (title, description, dueDate, status) VALUES (?, ?, ?, ?)",
 		t.Title, t.Description, t.DueDate, t.Status)
 
 	if e != nil {
-		return models.Task{}, fmt.Errorf("\nFailed to create new task.\nERROR: %v\n", e)
+		return format.Task{}, fmt.Errorf("\nFailed to create new task.\nERROR: %v\n", e)
 	}
 
 	id, e := res.LastInsertId()
 
 	if e != nil {
-		return models.Task{}, fmt.Errorf("\nFailed to get task id.\nERROR: %v\n", e)
+		return format.Task{}, fmt.Errorf("\nFailed to get task id.\nERROR: %v\n", e)
 	}
 
 	t.ID = int(id)
 	return t, nil
 }
 
-func UpdateTask(id int, t models.Task) (models.Task, error) {
+func UpdateTask(id int, t format.Task) (format.Task, error) {
 	_, e := db.Exec("UPDATE tasks SET title = ?, description = ?, dueDate = ? WHERE id = ?",
 		t.Title, t.Description, t.DueDate, id)
 
 	if e != nil {
-		return models.Task{}, fmt.Errorf("failed to update task: %v", e)
+		return format.Task{}, fmt.Errorf("failed to update task: %v", e)
 	}
 
 	updatedTask, e := GetTaskID(id)
 
 
     if e != nil {
-        return models.Task{}, fmt.Errorf("failed to get updated task: %v", e)
+        return format.Task{}, fmt.Errorf("failed to get updated task: %v", e)
     }
 
     return updatedTask, nil
