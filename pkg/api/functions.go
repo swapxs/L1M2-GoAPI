@@ -29,6 +29,25 @@ func Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, t)
 }
 
+func Read(c *gin.Context) {
+	getIdPara := c.Param("id")
+	
+	id, e := strconv.Atoi(getIdPara)
+
+	if e != nil {
+		// error
+		return
+	}
+
+	t, e := database.GetTaskID(id)
+
+	if e != nil {
+		return
+	}
+
+	c.JSON(http.StatusOK, t)
+}
+
 func Update(c *gin.Context) {
 	var updateTask format.Task
 	getIdPara := c.Param("id")
