@@ -4,7 +4,7 @@
 * desired function in the database.go file. */
 
 // TODO
-// [ ] fix error message
+// [X] fix error message
 // [ ] fix potential bugs
 package api
 
@@ -30,7 +30,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-    log.Printf("Task received: %+v\n", newTask)
+    log.Printf("Task received: %+v ", newTask)
 
 	if e := IsValidTask(newTask); e != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": e.Error()})
@@ -64,7 +64,7 @@ func Read(c *gin.Context) {
 		if e.Error() == "task not found" {
 			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task:\n%v", e)})
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task: %v", e)})
 		}
 		return
 	}
@@ -76,7 +76,7 @@ func ReadAll(c *gin.Context) {
 	t, e := database.GetAllTasks()
 
 	if e != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get all tasks:\n%v", e)})
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get all tasks: %v", e)})
 		return
 	}
 
@@ -96,7 +96,7 @@ func Update(c *gin.Context) {
 	}
 
 	if e := c.BindJSON(&updateTask); e != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": fmt.Sprintf("Invalid request:\n%v", e)})
+		c.JSON(http.StatusBadRequest, gin.H{"Error": fmt.Sprintf("Invalid request: %v", e)})
 		return
 	}
 
@@ -111,7 +111,7 @@ func Update(c *gin.Context) {
 		if e.Error() == "Task not found" {
 			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task:\n%v", e)})
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task: %v", e)})
 		}
 		return
 	}
@@ -133,7 +133,12 @@ func Delete(c *gin.Context) {
 	e = database.DeleteTask(id)
 
 	if e != nil {
-		return
+        if e.Error() == "Task not found 404" {
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to delete task: %v", e)})
+		}
+        return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"Message": "Task deleted successfully"})
