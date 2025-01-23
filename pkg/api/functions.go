@@ -22,22 +22,22 @@ import (
 func Create(c *gin.Context) {
 	var newTask format.Task
 
-	if e := c.BindJSON(&newTask); e != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": fmt.Sprintf("Invalid Request: %v", e)})
+	if err := c.BindJSON(&newTask); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": fmt.Sprintf("Invalid Request: %v", err)})
 		return
 	}
 
 	log.Printf("Task received: %+v ", newTask)
 
-	if e := IsValidTask(newTask); e != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": e.Error()})
+	if err := IsValidTask(newTask); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
 
-	t, e := database.CreateTask(newTask)
+	t, err := database.CreateTask(newTask)
 
-	if e != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to create task: %v", e)})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to create task: %v", err)})
 		return
 	}
 
@@ -48,20 +48,20 @@ func Create(c *gin.Context) {
 func Read(c *gin.Context) {
 	getIdPara := c.Param("id")
 
-	id, e := strconv.Atoi(getIdPara)
+	id, err := strconv.Atoi(getIdPara)
 
-	if e != nil {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid task ID"})
 		return
 	}
 
-	t, e := database.GetTaskID(id)
+	t, err := database.GetTaskID(id)
 
-	if e != nil {
-		if e.Error() == "task not found" {
+	if err != nil {
+		if err.Error() == "task not found" {
 			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task: %v", e)})
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task: %v", err)})
 		}
 		return
 	}
@@ -70,10 +70,10 @@ func Read(c *gin.Context) {
 }
 
 func ReadAll(c *gin.Context) {
-	t, e := database.GetAllTasks()
+	t, err := database.GetAllTasks()
 
-	if e != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get all tasks: %v", e)})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get all tasks: %v", err)})
 		return
 	}
 
@@ -85,30 +85,30 @@ func Update(c *gin.Context) {
 	var updateTask format.Task
 	getIdPara := c.Param("id")
 
-	id, e := strconv.Atoi(getIdPara)
+	id, err := strconv.Atoi(getIdPara)
 
-	if e != nil {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid task ID"})
 		return
 	}
 
-	if e := c.BindJSON(&updateTask); e != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": fmt.Sprintf("Invalid request: %v", e)})
+	if err := c.BindJSON(&updateTask); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": fmt.Sprintf("Invalid request: %v", err)})
 		return
 	}
 
-	if e := IsValidTask(updateTask); e != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": e.Error()})
+	if err := IsValidTask(updateTask); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
 
-	t, e := database.UpdateTask(id, updateTask)
+	t, err := database.UpdateTask(id, updateTask)
 
-	if e != nil {
-		if e.Error() == "Task not found" {
+	if err != nil {
+		if err.Error() == "Task not found" {
 			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task: %v", e)})
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to get task: %v", err)})
 		}
 		return
 	}
@@ -120,20 +120,20 @@ func Update(c *gin.Context) {
 func Delete(c *gin.Context) {
 	getIdPara := c.Param("id")
 
-	id, e := strconv.Atoi(getIdPara)
+	id, err := strconv.Atoi(getIdPara)
 
-	if e != nil {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid task ID"})
 		return
 	}
 
-	e = database.DeleteTask(id)
+	err = database.DeleteTask(id)
 
-	if e != nil {
-		if e.Error() == "Task not found 404" {
+	if err != nil {
+		if err.Error() == "Task not found 404" {
 			c.JSON(http.StatusNotFound, gin.H{"Error": "Task not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to delete task: %v", e)})
+			c.JSON(http.StatusInternalServerError, gin.H{"Error": fmt.Sprintf("Failed to delete task: %v", err)})
 		}
 		return
 	}
@@ -166,7 +166,7 @@ func IsValidTask(t format.Task) error {
 }
 
 func IsValidDate(d string) bool {
-	_, e := time.Parse("2006-01-02", d)
+	_, err := time.Parse("2006-01-02", d)
 
-	return e == nil
+	return err == nil
 }
