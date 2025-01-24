@@ -11,7 +11,7 @@ import (
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
-	"swapxs/api_proj/pkg/format"
+	"swapxs/GoAPI/pkg/format"
 )
 
 var db *sql.DB

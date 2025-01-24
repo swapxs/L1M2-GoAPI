@@ -11,8 +11,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"log"
-	"swapxs/api_proj/pkg/api"
-	"swapxs/api_proj/pkg/database"
+	"swapxs/GoAPI/pkg/api"
+	"swapxs/GoAPI/pkg/database"
 )
 
 func main() {

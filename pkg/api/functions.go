@@ -12,8 +12,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"swapxs/api_proj/pkg/database"
-	"swapxs/api_proj/pkg/format"
+	"swapxs/GoAPI/pkg/database"
+	"swapxs/GoAPI/pkg/format"
 	"time"
 )
 

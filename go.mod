@@ -1,4 +1,4 @@
-module swapxs/api_proj
+module swapxs/GoAPI
 
 go 1.23.5
 
