@@ -1,0 +1,33 @@
+==============================================================================
+================ GO API PROJECT FOR L1 MODULE 2 @ XENONSTACK =================
+==============================================================================
+
+ABOUT THIS PROJECT:
+----
+Tools Used:
+    Language: Go
+    Libraries: Go-Gin, Go-SQLite
+
+Working:
+    This is an Task Management API Project that does the following functions:
+        1. Listens to port 8080 for HTTP requests using Gin's router feature
+        2. Checks the type of HTTP requests and acts according to the request
+           type
+        3. For GET /tasks, it lists all the tasks in the SQLite database
+        4. For GET /tasks/{id}, it lists the tasks with that id.
+        5. For POST /tasks, it creates a new task.
+        6. For PUT /tasks/{id}, it updates the task with the specific id.
+        7. For DELETE /tasks/{id}, it deletes the task with the id.
+
+Outcome and overview:
+    The program runs using the `go run main.go` command and can be buildable
+    using the `go build .` command, which will create an executable that can be
+    natively executed with good performance. Once built, it can be coppied to
+    the system's bin directory or any other path for native execution meaning
+    execution with mentioning a path to the executable.
+
+    For testing the API we have used POSTMAN with the GET, POST, PUT and DELETE
+    HTTP requests and have set our `http://localhost:8080` as our base url.
+
+    But this can also be done using the `curl` command available in most
+    Operating Systems.
